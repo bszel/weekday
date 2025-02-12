@@ -6,10 +6,15 @@
         <script>
             function init() {
                 var results = retreiveResults();
+                language = navigator.language;
                 status = "idle";
                 createGuessButtons();
                 createStartButton();
+                createSettingsButton();
                 displayResults();
+                generateSettings();
+                document.getElementById("settings").hidden = true;
+                document.getElementById("settings-background").hidden = true;
             }
             function randomInteger(min, max) {
                 return Math.floor(Math.random() * (max - min) ) + min;
@@ -23,7 +28,7 @@
             }
             function startGuess() {
                 date = randomDate(new Date(1900, 1, 1), new Date(2099, 12, 31));
-                document.getElementById("date").innerHTML = date.toLocaleDateString("en-UK");
+                document.getElementById("date").innerHTML = date.toLocaleDateString(language);
                 document.getElementById("guess").innerHTML = "";
                 document.getElementById("result").innerHTML = "";
                 document.getElementById("guess-buttons").hidden = false;
@@ -56,7 +61,7 @@
                 container.hidden = true;
                 for (let i = 1; i <= 7; i++) {
                     let button = document.createElement("button");
-                    button.textContent = `${i}`;
+                    button.textContent = new Intl.DateTimeFormat(language, {weekday: "short"}).format(new Date(2025, 2, 9 + i));
                     button.id = "guess-button";
                     button.setAttribute("value", i);
                     button.onclick = function () {
@@ -74,6 +79,21 @@
                     startGuess();
                 };
                 container.appendChild(button);
+            }
+            function createSettingsButton() {
+                let container = document.getElementById("settings-button");
+                let button = document.createElement("button");
+                button.textContent = "Settings";
+                button.id = "settings-button";
+                button.onclick = function () {
+                    document.getElementById("settings").hidden = false;
+                    document.getElementById("settings-background").hidden = false;
+                };
+                container.appendChild(button);
+                document.getElementById("settings-background").onclick = function () {
+                    document.getElementById("settings").hidden = true;
+                    document.getElementById("settings-background").hidden = true;
+                };
             }
             document.addEventListener("keypress", onEvent); 
                 function onEvent(event){
@@ -101,12 +121,25 @@
                 results.push(result);
                 localStorage.setItem("results", JSON.stringify(results));
             }
+            function Statistic(name, average, accuracy) {
+                this.name = name;
+                this.average = average;
+                this.accuracy = accuracy;
+            }
             function displayResults() {
                 document.querySelector("#results-table tbody").innerHTML = results.slice().reverse().map((result, index) => `<tr class="row-type-${index % 2}"><td>${results.length - index}</td><td>${result.time}</td></tr>`).join('');
-                let average = getAverage();
-                let accuracy = getAccuracy();
-                document.getElementById("average").innerHTML = average.toFixed(2);
-                document.getElementById("accuracy").innerHTML = (accuracy * 100).toFixed(1) + "%";
+                let statistics = []
+                if (results.length >= 5) {
+                    statistics.push(new Statistic("Last 5", getAverage(5), getAccuracy(5)))
+                }
+                if (results.length >= 10) {
+                    statistics.push(new Statistic("Last 10", getAverage(10), getAccuracy(10)))
+                }
+                if (results.length >= 100) {
+                    statistics.push(new Statistic("Last 100", getAverage(100), getAccuracy(100)))
+                }
+                statistics.push(new Statistic("Last " + results.length, getAverage(), getAccuracy()))
+                document.querySelector("#stats-table tbody").innerHTML = statistics.map((statistic, index) => `<tr class="row-type-${index % 2}"><th>${statistic.name}</th><td>${statistic.average.toFixed(2)}</td><td>${(statistic.accuracy * 100).toFixed(0) + "%"}</td></tr>`).join('');
             }
             function getAverage(last) {
                 let sum = 0;
@@ -126,14 +159,40 @@
                         num ++;
                     }
                 });
-                if (last > 0) {
+                if (last > 0 && last < results.length) {
                     return num / last
                 }
                 return num / results.length;
             }
+            function generateSettings() {
+                language = localStorage.getItem("language");
+                if (language == null) {
+                    language = navigator.language;
+                }
+                languages = []
+                languages.push(language);
+                locales = ["en-UK", 'en-US', 'hu-HU', navigator.language];
+                locales.forEach(locale => {
+                    if (!languages.includes(locale)) {
+                        languages.push(locale);
+                    }
+                });
+                let select = document.getElementById("language-setting");
+                select.addEventListener("change", function () {
+                    language = this.value;
+                    localStorage.setItem("language", language);
+                });
+                languages.forEach(lan => {
+                    let option = document.createElement("option");
+                    option.value = lan;
+                    option.text = lan;
+                    select.appendChild(option);
+                });
+            }
         </script>
     </head>
     <body>
+        <div id="settings-button"></div>
         <div id="guess-area">
             <div id="date"></div>
             <div id="start-button"></div>
@@ -144,15 +203,14 @@
         <div id="statistics">
             <div id="stats">
                 <table id="stats-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Avg</th>
+                            <th>Acc</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr class="row-type-0">
-                            <td>Average</td>
-                            <td id="average"></td>
-                        </tr>
-                        <tr class="row-type-0">
-                            <td>Accuracy</td>
-                            <td id="accuracy"></td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -167,6 +225,14 @@
                     <tbody>
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div id="settings-background"></div>
+        <div id="settings">
+            <div class="setting">
+                <div>Date format:&nbsp</div>
+                <select id="language-setting">
+                </select>
             </div>
         </div>
         <script>

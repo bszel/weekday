@@ -26,7 +26,7 @@ button:hover {
 #guess-button {
     height: 10vh;
     width: 10vh;
-    font-size: 5vh;
+    font-size: 4vh;
     border: none;
     margin: 1vh 1vh;
 }
@@ -43,7 +43,7 @@ button:hover {
     position:absolute;
     bottom: 0;
     height: 80vh;
-    width: 20vh;
+    width: 30vh;
     max-height: 80vw;
     min-height: 40vh;
     overflow: hidden;
@@ -82,4 +82,37 @@ button:hover {
 }
 .row-type-1:hover {
     background-color: rgb(100, 100, 100);
+}
+select {
+    background-color: rgb(83, 83, 83);
+    color: rgb(224, 224, 224);
+}
+#settings {
+    position: absolute;
+    left: 15vw;
+    top: 15vh;
+    background-color:rgb(41, 41, 41);
+    opacity: 0.8;
+    height: 70vh;
+    width: 70vw;
+}
+#settings-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(41, 41, 41);
+    opacity: 0.3;
+}
+#settings-button {
+    border: none;
+    font-size: 2.2vh;
+}
+#language-setting {
+    font-size: 2.2vh;
+}
+.setting {
+    display:flex;
+    flex-direction: row;
 }
