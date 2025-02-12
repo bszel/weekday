@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            function init() {
+                var results = retreiveResults();
+                status = "idle";
+                displayResults();
+            }
+            function randomInteger(min, max) {
+                return Math.floor(Math.random() * (max - min) ) + min;
+            }
+            function randomDate(startDate, endDate) {
+                let millisecondsBetween = endDate - startDate;
+                let randomMilliseconds = randomInteger(0, millisecondsBetween)
+                let date = startDate;
+                date.setMilliseconds(date.getDate() + randomMilliseconds);
+                return date;
+            }
+            function startGuess() {
+                date = randomDate(new Date(1900, 1, 1), new Date(2099, 12, 31));
+                document.getElementById("date").innerHTML = date.toLocaleDateString("en-UK");
+                document.getElementById("guess").innerHTML = "";
+                document.getElementById("result").innerHTML = "";
+                startTime = new Date();
+                status = "guess";
+            }
+            function makeGuess(guess) {
+                let time;
+                document.getElementById("guess").innerHTML = guess;
+                if (date.getDay() == (Number(guess) % 7)) {
+                    endTime = new Date();
+                    time = (endTime - startTime) / 1000;
+                    document.getElementById("result").innerHTML = "correct: " + time;
+                }
+                else {
+                    time = "-";
+                    document.getElementById("result").innerHTML = "wrong: " + date.getDay();
+                }
+                saveResult(time);
+                displayResults();
+                status = "idle";
+            }
+            document.addEventListener("keypress", onEvent); 
+                function onEvent(event){
+                    if (status == "guess" && ['1', '2', '3', '4', '5', '6', '7'].includes(event.key)) {
+                        guess = event.key;
+                        makeGuess(guess);
+                    }
+                    else if (status == "idle" && [' '].includes(event.key)){
+                        startGuess();
+                    }
+                }
+            function Result(date, time) {
+                this.date = date;
+                this.time = time;
+            }
+            function retreiveResults() {
+                results = JSON.parse(localStorage.getItem("results"));
+                if (results == null) {
+                    results = []
+                }
+                return results;
+            }
+            function saveResult(time) {
+                result = new Result(new Date(), time)
+                results.push(result);
+                localStorage.setItem("results", JSON.stringify(results));
+            }
+            function displayResults() {
+                document.querySelector("#results tbody").innerHTML = results.slice().reverse().map((result, index) => `<tr><td>${results.length - index}</td><td>${result.time}</td><td></tr>`).join('');
+                let average = getAverage();
+                let accuracy = getAccuracy();
+                document.getElementById("average").innerHTML = "average: " + average;
+                document.getElementById("accuracy").innerHTML = "accuracy: " + accuracy;
+            }
+            function getAverage(last) {
+                let sum = 0;
+                let num = 0;
+                results.slice(-last).forEach(result => {
+                    if (result.time != "-") {
+                        sum += Number(result.time);
+                        num ++;
+                    }
+                });
+                return sum / num;
+            }
+            function getAccuracy(last) {
+                let num = 0;
+                results.slice(-last).forEach(result => {
+                    if (result.time != "-") {
+                        num ++;
+                    }
+                });
+                if (last > 0) {
+                    return num / last
+                }
+                return num / results.length;
+            }
+        </script>
+    </head>
+    <body>
+        <p>space: start, 1-7: monday-sunday</p>
+        <p id="date"></p>
+        <p id="guess"></p>
+        <p id="result"></p>
+        <p id="average"></p>
+        <p id="accuracy"></p>
+        <table id="results">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <script>
+            init()
+        </script>
+    </body>
+</html>
