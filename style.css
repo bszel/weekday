@@ -12,35 +12,45 @@ button:hover {
     background-color: rgb(70, 70, 70);
 }
 #start-button {
-    text-align: center;
+    margin: 0 auto;
     border: none;
     font-size: 4vh;
-    padding: 10px 20px;
+    height: 10vh;
+    width: 20vh;
 }
 #guess-buttons {
-    text-align: center;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 40vh;
 }
 #guess-button {
-    font-size: 4vh;
+    height: 10vh;
+    width: 10vh;
+    font-size: 5vh;
     border: none;
-    padding: 0px 10px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin: 1vh 1vh;
+}
+#guess-area{
+    text-align: center;
 }
 #date {
     text-align: center;
     font-size: 5vh;
 }
 #statistics {
+    display: flex;
+    flex-direction: column;
     position:absolute;
-    top: 20vh;
+    bottom: 0;
     height: 80vh;
-    width: 30vh;
+    width: 20vh;
+    max-height: 80vw;
+    min-height: 40vh;
     overflow: hidden;
     text-align: center;
+    box-sizing: content-box;
 }
 #stats {
-    position: absolute;
     top:0;
     width: 100%;
 }
@@ -50,12 +60,9 @@ button:hover {
     table-layout: fixed;
 }
 #results {
-    position: absolute;
-    top: 10%;
-    height: 90%;
+    flex: 1;
     width: 100%;
     overflow-y: auto;
-    box-sizing: content-box;
 }
 #results::-webkit-scrollbar {
     display: none;
