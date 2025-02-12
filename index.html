@@ -5,6 +5,8 @@
             function init() {
                 var results = retreiveResults();
                 status = "idle";
+                createGuessButtons();
+                createStartButton();
                 displayResults();
             }
             function randomInteger(min, max) {
@@ -22,6 +24,8 @@
                 document.getElementById("date").innerHTML = date.toLocaleDateString("en-UK");
                 document.getElementById("guess").innerHTML = "";
                 document.getElementById("result").innerHTML = "";
+                displayGuessButtons();
+                document.getElementById("start-button").hidden = true;
                 startTime = new Date();
                 status = "guess";
             }
@@ -39,7 +43,43 @@
                 }
                 saveResult(time);
                 displayResults();
+                hideGuessButtons();
+                document.getElementById("start-button").hidden = false;
                 status = "idle";
+            }
+            function createGuessButtons() {
+                let container = document.getElementById("buttons");
+                for (let i = 1; i <= 7; i++) {
+                    let button = document.createElement("button");
+                    button.textContent = `${i}`;
+                    button.id = `button-${i}`;
+                    button.hidden = true;
+                    button.setAttribute("value", i);
+                    button.onclick = function () {
+                        makeGuess(button.getAttribute("value"));
+                    };
+                    container.appendChild(button);
+                }
+            }
+            function displayGuessButtons() {
+                for (let i = 1; i <= 7; i++) {
+                    document.getElementById(`button-${i}`).hidden = false
+                }
+            }
+            function hideGuessButtons() {
+                for (let i = 1; i <= 7; i++) {
+                    document.getElementById(`button-${i}`).hidden = true
+                }
+            }
+            function createStartButton() {
+                let container = document.getElementById("start-button");
+                let button = document.createElement("button");
+                button.textContent = "Start";
+                button.id = "start-button";
+                button.onclick = function () {
+                    startGuess();
+                };
+                container.appendChild(button);
             }
             document.addEventListener("keypress", onEvent); 
                 function onEvent(event){
@@ -102,6 +142,8 @@
     <body>
         <p>space: start, 1-7: monday-sunday</p>
         <p id="date"></p>
+        <div id="start-button"></div>
+        <div id="buttons"></div>
         <p id="guess"></p>
         <p id="result"></p>
         <p id="average"></p>
@@ -109,7 +151,7 @@
         <table id="results">
             <thead>
                 <tr>
-                    <th>Date</th>
+                    <th>ID</th>
                     <th>Time</th>
                 </tr>
             </thead>
