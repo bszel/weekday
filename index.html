@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Weekday</title>
+        <link rel="stylesheet" href="style.css">
         <script>
             function init() {
                 var results = retreiveResults();
@@ -24,8 +26,9 @@
                 document.getElementById("date").innerHTML = date.toLocaleDateString("en-UK");
                 document.getElementById("guess").innerHTML = "";
                 document.getElementById("result").innerHTML = "";
-                displayGuessButtons();
+                document.getElementById("guess-buttons").hidden = false;
                 document.getElementById("start-button").hidden = true;
+                document.getElementById("statistics").hidden = true;
                 startTime = new Date();
                 status = "guess";
             }
@@ -43,32 +46,23 @@
                 }
                 saveResult(time);
                 displayResults();
-                hideGuessButtons();
+                document.getElementById("guess-buttons").hidden = true;
                 document.getElementById("start-button").hidden = false;
+                document.getElementById("statistics").hidden = false;
                 status = "idle";
             }
             function createGuessButtons() {
-                let container = document.getElementById("buttons");
+                let container = document.getElementById("guess-buttons");
+                container.hidden = true;
                 for (let i = 1; i <= 7; i++) {
                     let button = document.createElement("button");
                     button.textContent = `${i}`;
-                    button.id = `button-${i}`;
-                    button.hidden = true;
+                    button.id = "guess-button";
                     button.setAttribute("value", i);
                     button.onclick = function () {
                         makeGuess(button.getAttribute("value"));
                     };
                     container.appendChild(button);
-                }
-            }
-            function displayGuessButtons() {
-                for (let i = 1; i <= 7; i++) {
-                    document.getElementById(`button-${i}`).hidden = false
-                }
-            }
-            function hideGuessButtons() {
-                for (let i = 1; i <= 7; i++) {
-                    document.getElementById(`button-${i}`).hidden = true
                 }
             }
             function createStartButton() {
@@ -108,11 +102,11 @@
                 localStorage.setItem("results", JSON.stringify(results));
             }
             function displayResults() {
-                document.querySelector("#results tbody").innerHTML = results.slice().reverse().map((result, index) => `<tr><td>${results.length - index}</td><td>${result.time}</td><td></tr>`).join('');
+                document.querySelector("#results-table tbody").innerHTML = results.slice().reverse().map((result, index) => `<tr class="row-type-${index % 2}"><td>${results.length - index}</td><td>${result.time}</td></tr>`).join('');
                 let average = getAverage();
                 let accuracy = getAccuracy();
-                document.getElementById("average").innerHTML = "average: " + average;
-                document.getElementById("accuracy").innerHTML = "accuracy: " + accuracy;
+                document.getElementById("average").innerHTML = average.toFixed(2);
+                document.getElementById("accuracy").innerHTML = (accuracy * 100).toFixed(1) + "%";
             }
             function getAverage(last) {
                 let sum = 0;
@@ -140,24 +134,40 @@
         </script>
     </head>
     <body>
-        <p>space: start, 1-7: monday-sunday</p>
-        <p id="date"></p>
+        <div>space: start, 1-7: monday-sunday</div>
+        <div id="guess"></div>
+        <div id="result"></div>
+        <div id="date"></div>
+        <div id="statistics">
+            <div id="stats">
+                <table id="stats-table">
+                    <tbody>
+                        <tr class="row-type-0">
+                            <td>Average</td>
+                            <td id="average"></td>
+                        </tr>
+                        <tr class="row-type-0">
+                            <td>Accuracy</td>
+                            <td id="accuracy"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="results">
+                <table id="results-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <div id="start-button"></div>
-        <div id="buttons"></div>
-        <p id="guess"></p>
-        <p id="result"></p>
-        <p id="average"></p>
-        <p id="accuracy"></p>
-        <table id="results">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Time</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <div id="guess-buttons"></div>
         <script>
             init()
         </script>

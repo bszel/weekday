@@ -1,0 +1,78 @@
+body {
+    background-color: rgb(34, 34, 34);
+    color: rgb(224, 224, 224);
+    font-size: 2.2vh;
+    font-family: 'Arial';
+}
+button {
+    background-color: rgb(53, 53, 53);
+    color: rgb(224, 224, 224);
+}
+button:hover {
+    background-color: rgb(70, 70, 70);
+}
+#start-button {
+    text-align: center;
+    border: none;
+    font-size: 4vh;
+    padding: 10px 20px;
+}
+#guess-buttons {
+    text-align: center;
+}
+#guess-button {
+    font-size: 4vh;
+    border: none;
+    padding: 0px 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+#date {
+    text-align: center;
+    font-size: 5vh;
+}
+#statistics {
+    position:absolute;
+    top: 20vh;
+    height: 80vh;
+    width: 30vh;
+    overflow: hidden;
+    text-align: center;
+}
+#stats {
+    position: absolute;
+    top:0;
+    width: 100%;
+}
+#stats-table {
+    border: 1px solid rgb(83, 83, 83);
+    width: 100%;
+    table-layout: fixed;
+}
+#results {
+    position: absolute;
+    top: 10%;
+    height: 90%;
+    width: 100%;
+    overflow-y: auto;
+    box-sizing: content-box;
+}
+#results::-webkit-scrollbar {
+    display: none;
+}
+#results-table {
+    border: 1px solid rgb(83, 83, 83);
+    width: 100%;
+}
+.row-type-0 {
+    background-color: rgb(51, 51, 51);
+}
+.row-type-1 {
+    background-color: rgb(66, 66, 66);
+}
+.row-type-0:hover {
+    background-color: rgb(100, 100, 100);
+}
+.row-type-1:hover {
+    background-color: rgb(100, 100, 100);
+}
