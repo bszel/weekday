@@ -68,6 +68,9 @@
                     button.onclick = function () {
                         makeGuess(button.getAttribute("value"));
                     };
+                    button.ontouchstart = function () {
+                        makeGuess(button.getAttribute("value"));
+                    }
                     container.appendChild(button);
                 }
             }
