@@ -9,15 +9,14 @@
                 currentSession = localStorage.getItem("current-session") ?? 1;
                 results = retreiveResults(currentSession);
                 status = "idle";
+                date = null;
                 createGuessButtons();
                 createStartButton();
                 createSettingsButton();
                 createSessionSelect();
-                displayResults();
-                createSettings();
-                resetStatButton();
-                document.getElementById("settings").hidden = true;
-                document.getElementById("settings-background").hidden = true;
+                displayStats();
+                createLanguageSetting();
+                createResetStatButton();
             }
             function randomInteger(min, max) {
                 return Math.floor(Math.random() * (max - min) ) + min;
@@ -32,30 +31,28 @@
             function startGuess() {
                 date = randomDate(new Date(1900, 1, 1), new Date(2099, 12, 31));
                 document.getElementById("date").innerHTML = date.toLocaleDateString(language);
-                document.getElementById("guess").innerHTML = "";
-                document.getElementById("result").innerHTML = "";
                 document.getElementById("guess-buttons").hidden = false;
-                document.getElementById("start-button").hidden = true;
+                document.getElementById("result-section").hidden = true;
                 document.getElementById("statistics").hidden = true;
                 startTime = new Date();
                 status = "guess";
             }
             function makeGuess(guess) {
                 let time;
-                document.getElementById("guess").innerHTML = guess;
+                document.getElementById("guess").innerHTML = "You guessed: " + new Intl.DateTimeFormat(language, {weekday: "long"}).format(new Date(2025, 2, 9 + Number(guess)));
                 if (date.getDay() == (Number(guess) % 7)) {
                     endTime = new Date();
                     time = (endTime - startTime) / 1000;
-                    document.getElementById("result").innerHTML = "correct: " + time;
+                    document.getElementById("result").innerHTML = "Correct: " + time + " seconds";
                 }
                 else {
                     time = "-";
-                    document.getElementById("result").innerHTML = "wrong: " + date.getDay();
+                    document.getElementById("result").innerHTML = "Wrong, the answer is: " + new Intl.DateTimeFormat(language, {weekday: "long"}).format(date);
                 }
                 saveResult(time);
-                displayResults();
+                displayStats();
                 document.getElementById("guess-buttons").hidden = true;
-                document.getElementById("start-button").hidden = false;
+                document.getElementById("result-section").hidden = false;
                 document.getElementById("statistics").hidden = false;
                 status = "idle";
             }
@@ -98,6 +95,8 @@
                     document.getElementById("settings").hidden = true;
                     document.getElementById("settings-background").hidden = true;
                 };
+                document.getElementById("settings").hidden = true;
+                document.getElementById("settings-background").hidden = true;
             }
             document.addEventListener("keypress", onEvent); 
                 function onEvent(event){
@@ -118,8 +117,7 @@
                 return results ?? [];
             }
             function saveResult(time) {
-                result = new Result(new Date(), time)
-                results.push(result);
+                results.push(new Result(new Date(), time));
                 localStorage.setItem("session-" + currentSession, JSON.stringify(results));
             }
             function Statistic(name, average, accuracy) {
@@ -127,7 +125,7 @@
                 this.average = average;
                 this.accuracy = accuracy;
             }
-            function displayResults() {
+            function displayStats() {
                 document.querySelector("#results-table tbody").innerHTML = results.slice().reverse().map((result, index) => `<tr class="row-type-${index % 2}"><td>${results.length - index}</td><td>${result.time}</td></tr>`).join('');
                 let statistics = []
                 if (results.length >= 5) {
@@ -165,7 +163,7 @@
                 }
                 return num / results.length;
             }
-            function createSettings() {
+            function createLanguageSetting() {
                 language = localStorage.getItem("language");
                 if (language == null) {
                     language = navigator.language;
@@ -182,9 +180,7 @@
                 select.addEventListener("change", function () {
                     language = this.value;
                     localStorage.setItem("language", language);
-                    for (let i = 1; i <= 7; i++) {
-                        document.getElementById("guess-button-" + i).innerHTML = new Intl.DateTimeFormat(language, {weekday: "short"}).format(new Date(2025, 2, 9 + i));
-                    }
+                    reloadDates(language);
                 });
                 languages.forEach(lan => {
                     let option = document.createElement("option");
@@ -214,7 +210,7 @@
                         localStorage.setItem("current-session", currentSession);
                     }
                     results = retreiveResults(currentSession);
-                    displayResults();
+                    displayStats();
                 });
                 let sessionCount = localStorage.getItem("session-count") ?? 1;
                 for (i = 1; i <= sessionCount; i++) {
@@ -229,7 +225,7 @@
                 select.appendChild(option);
                 select.value = localStorage.getItem("current-session") ?? 1;
             }
-            function resetStatButton() {
+            function createResetStatButton() {
                 let button = document.getElementById("reset-stats-button");
                 button.onclick = function () {
                     if (confirm("This will delete all of your saved times, are you sure?")) {
@@ -241,9 +237,15 @@
                         localStorage.removeItem("current-session");
                         createSessionSelect();
                         results = retreiveResults(currentSession);
-                        displayResults();
+                        displayStats();
                     }
                 }
+            }
+            function reloadDates(language) {
+                for (let i = 1; i <= 7; i++) {
+                        document.getElementById("guess-button-" + i).innerHTML = new Intl.DateTimeFormat(language, {weekday: "short"}).format(new Date(2025, 2, 9 + i));
+                    }
+                document.getElementById("date").innerHTML = date ? date.toLocaleDateString(language) : "";
             }
         </script>
     </head>
@@ -251,10 +253,12 @@
         <div id="settings-button"></div>
         <div id="guess-area">
             <div id="date"></div>
-            <div id="start-button"></div>
             <div id="guess-buttons"></div>
-            <div id="guess"></div>
-            <div id="result"></div>
+            <div id="result-section">
+                <div id="guess"></div>
+                <div id="result"></div>
+                <div id="start-button"></div>
+            </div>
         </div>
         <div id="statistics">
             <div id="session">

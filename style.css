@@ -9,6 +9,7 @@ button {
     color: rgb(224, 224, 224);
     border: none;
     font-size: 2.2vh;
+    touch-action: manipulation;
 }
 button:hover {
     background-color: rgb(70, 70, 70);
@@ -18,6 +19,7 @@ button:hover {
     font-size: 4vh;
     height: 10vh;
     width: 20vh;
+    padding: 2vh;
 }
 #guess-buttons {
     margin: 0 auto;
