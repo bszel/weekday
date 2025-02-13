@@ -7,13 +7,14 @@ body {
 button {
     background-color: rgb(53, 53, 53);
     color: rgb(224, 224, 224);
+    border: none;
+    font-size: 2.2vh;
 }
 button:hover {
     background-color: rgb(70, 70, 70);
 }
 #start-button {
     margin: 0 auto;
-    border: none;
     font-size: 4vh;
     height: 10vh;
     width: 20vh;
@@ -23,11 +24,10 @@ button:hover {
     width: 90%;
     max-width: 40vh;
 }
-#guess-button {
+.guess-button {
     height: 10vh;
     width: 10vh;
     font-size: 4vh;
-    border: none;
     margin: 1vh 1vh;
 }
 #guess-area{
@@ -49,13 +49,13 @@ button:hover {
     overflow: hidden;
     text-align: center;
     box-sizing: content-box;
+    border: 1px solid rgb(83, 83, 83);
 }
 #stats {
     top:0;
     width: 100%;
 }
 #stats-table {
-    border: 1px solid rgb(83, 83, 83);
     width: 100%;
     table-layout: fixed;
 }
@@ -68,7 +68,6 @@ button:hover {
     display: none;
 }
 #results-table {
-    border: 1px solid rgb(83, 83, 83);
     width: 100%;
 }
 .row-type-0 {
@@ -87,14 +86,20 @@ select {
     background-color: rgb(83, 83, 83);
     color: rgb(224, 224, 224);
 }
+thead {
+    background-color: rgb(29, 29, 29);
+}
 #settings {
     position: absolute;
-    left: 15vw;
-    top: 15vh;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
     background-color:rgb(41, 41, 41);
     opacity: 0.8;
     height: 70vh;
-    width: 70vw;
+    width: 66vw;
+    padding: 10px;
+    border: 1px solid rgb(83, 83, 83);
 }
 #settings-background {
     position: absolute;
@@ -106,16 +111,30 @@ select {
     opacity: 0.3;
 }
 #settings-button {
-    border: none;
     font-size: 2.2vh;
 }
-#language-setting {
+select {
     font-size: 2.2vh;
 }
 .setting {
     display:flex;
     flex-direction: row;
+    line-height: 5vh;
 }
 [hidden] {
     display: none !important;
   }
+#session {
+    margin: 0 auto;
+    display:flex;
+    flex-direction: row;
+}
+#language-setting {
+    height: 4vh;
+    margin: auto 0;
+}
+#reset-stats-button {
+    width: 10vh;
+    height: 4vh;
+    margin: auto 0;
+}

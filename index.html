@@ -5,14 +5,17 @@
         <link rel="stylesheet" href="style.css">
         <script>
             function init() {
-                var results = retreiveResults();
-                language = navigator.language;
+                language = localStorage.language ?? navigator.language;
+                currentSession = localStorage.getItem("current-session") ?? 1;
+                results = retreiveResults(currentSession);
                 status = "idle";
                 createGuessButtons();
                 createStartButton();
                 createSettingsButton();
+                createSessionSelect();
                 displayResults();
-                generateSettings();
+                createSettings();
+                resetStatButton();
                 document.getElementById("settings").hidden = true;
                 document.getElementById("settings-background").hidden = true;
             }
@@ -62,7 +65,8 @@
                 for (let i = 1; i <= 7; i++) {
                     let button = document.createElement("button");
                     button.textContent = new Intl.DateTimeFormat(language, {weekday: "short"}).format(new Date(2025, 2, 9 + i));
-                    button.id = "guess-button";
+                    button.className = "guess-button";
+                    button.id = "guess-button-" + i;
                     button.setAttribute("value", i);
                     button.onclick = function () {
                         makeGuess(button.getAttribute("value"));
@@ -109,17 +113,14 @@
                 this.date = date;
                 this.time = time;
             }
-            function retreiveResults() {
-                results = JSON.parse(localStorage.getItem("results"));
-                if (results == null) {
-                    results = []
-                }
-                return results;
+            function retreiveResults(session) {
+                let results = JSON.parse(localStorage.getItem("session-" + session));
+                return results ?? [];
             }
             function saveResult(time) {
                 result = new Result(new Date(), time)
                 results.push(result);
-                localStorage.setItem("results", JSON.stringify(results));
+                localStorage.setItem("session-" + currentSession, JSON.stringify(results));
             }
             function Statistic(name, average, accuracy) {
                 this.name = name;
@@ -164,7 +165,7 @@
                 }
                 return num / results.length;
             }
-            function generateSettings() {
+            function createSettings() {
                 language = localStorage.getItem("language");
                 if (language == null) {
                     language = navigator.language;
@@ -181,6 +182,9 @@
                 select.addEventListener("change", function () {
                     language = this.value;
                     localStorage.setItem("language", language);
+                    for (let i = 1; i <= 7; i++) {
+                        document.getElementById("guess-button-" + i).innerHTML = new Intl.DateTimeFormat(language, {weekday: "short"}).format(new Date(2025, 2, 9 + i));
+                    }
                 });
                 languages.forEach(lan => {
                     let option = document.createElement("option");
@@ -188,6 +192,58 @@
                     option.text = lan;
                     select.appendChild(option);
                 });
+            }
+            function createSessionSelect() {
+                let select = document.getElementById("session-select");
+                select.innerHTML = "";
+                select.addEventListener("change", function () {
+                    if (this.value == "new") {
+                        let sessionCount = localStorage.getItem("session-count") ?? 1;
+                        currentSession = Number(sessionCount) + 1;
+                        localStorage.setItem("current-session", currentSession);
+                        localStorage.setItem("session-count", currentSession);
+                        localStorage.setItem("session-" + currentSession, JSON.stringify([]));
+                        let option = document.createElement("option");
+                        option.value = currentSession;
+                        option.text = currentSession;
+                        select.insertBefore(option, select.lastElementChild);
+                        select.value = currentSession;
+                    } 
+                    else {
+                        currentSession = this.value;
+                        localStorage.setItem("current-session", currentSession);
+                    }
+                    results = retreiveResults(currentSession);
+                    displayResults();
+                });
+                let sessionCount = localStorage.getItem("session-count") ?? 1;
+                for (i = 1; i <= sessionCount; i++) {
+                    let option = document.createElement("option");
+                    option.value = i;
+                    option.text = i;
+                    select.appendChild(option);
+                }
+                let option = document.createElement("option");
+                option.value = "new";
+                option.text = "New..."
+                select.appendChild(option);
+                select.value = localStorage.getItem("current-session") ?? 1;
+            }
+            function resetStatButton() {
+                let button = document.getElementById("reset-stats-button");
+                button.onclick = function () {
+                    if (confirm("This will delete all of your saved times, are you sure?")) {
+                        let sessionCount = localStorage.getItem("session-count") ?? 1;
+                        for (i = 1; i <= sessionCount; i++) {
+                            localStorage.removeItem("session-" + i);
+                        }
+                        localStorage.removeItem("session-count");
+                        localStorage.removeItem("current-session");
+                        createSessionSelect();
+                        results = retreiveResults(currentSession);
+                        displayResults();
+                    }
+                }
             }
         </script>
     </head>
@@ -201,6 +257,10 @@
             <div id="result"></div>
         </div>
         <div id="statistics">
+            <div id="session">
+                <div>Session:&nbsp</div>
+                <select id="session-select"></select>
+            </div>
             <div id="stats">
                 <table id="stats-table">
                     <thead>
@@ -210,8 +270,7 @@
                             <th>Acc</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
             <div id="results">
@@ -222,8 +281,7 @@
                             <th>Time</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -231,8 +289,11 @@
         <div id="settings">
             <div class="setting">
                 <div>Date format:&nbsp</div>
-                <select id="language-setting">
-                </select>
+                <select id="language-setting"></select>
+            </div>
+            <div class="setting">
+                <div>Reset all statistics&nbsp</div>
+                <button id="reset-stats-button">Reset</button>
             </div>
         </div>
         <script>
