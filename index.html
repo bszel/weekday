@@ -120,48 +120,61 @@
                 results.push(new Result(new Date(), time));
                 localStorage.setItem("session-" + currentSession, JSON.stringify(results));
             }
-            function Statistic(name, average, accuracy) {
+            function Statistic(name, average, accuracy, best) {
                 this.name = name;
-                this.average = average;
-                this.accuracy = accuracy;
+                if (average != null) {
+                    this.average = average.toFixed(2);
+                }
+                else {
+                    this.average = "";
+                }
+                this.accuracy = (accuracy * 100).toFixed(0) + "%";
+                if (best != null) {
+                    this.best = best.toFixed(2);
+                }
+                else {
+                    this.best = "";
+                }
             }
             function displayStats() {
                 document.querySelector("#results-table tbody").innerHTML = results.slice().reverse().map((result, index) => `<tr class="row-type-${index % 2}"><td>${results.length - index}</td><td>${result.time}</td></tr>`).join('');
                 let statistics = []
-                if (results.length >= 5) {
-                    statistics.push(new Statistic("Last 5", getAverage(5), getAccuracy(5)))
+                let milestones = [1, 5, 10, 100]
+                milestones.forEach(milestone => {
+                    if (results.length >= milestone) {
+                        let [average, accuracy] = getAverage(results.slice(-milestone));
+                        let bestAverage = getBestAverage(milestone, 0.9);
+                        statistics.push(new Statistic(milestone, average, accuracy, bestAverage));
+                    }
+                });
+                if (!milestones.includes(results.length)) {
+                    let [average, accuracy] = getAverage(results);
+                    statistics.push(new Statistic(results.length, average, accuracy));
                 }
-                if (results.length >= 10) {
-                    statistics.push(new Statistic("Last 10", getAverage(10), getAccuracy(10)))
-                }
-                if (results.length >= 100) {
-                    statistics.push(new Statistic("Last 100", getAverage(100), getAccuracy(100)))
-                }
-                statistics.push(new Statistic("Last " + results.length, getAverage(), getAccuracy()))
-                document.querySelector("#stats-table tbody").innerHTML = statistics.map((statistic, index) => `<tr class="row-type-${index % 2}"><th>${statistic.name}</th><td>${statistic.average.toFixed(2)}</td><td>${(statistic.accuracy * 100).toFixed(0) + "%"}</td></tr>`).join('');
+                document.querySelector("#stats-table tbody").innerHTML = statistics.map((statistic, index) => `<tr class="row-type-${index % 2}"><th>${statistic.name}</th><td>${statistic.average}</td><td>${statistic.accuracy}</td><td>${statistic.best}</td></tr>`).join('');
             }
-            function getAverage(last) {
+            function getAverage(results) {
                 let sum = 0;
                 let num = 0;
-                results.slice(-last).forEach(result => {
+                results.forEach(result => {
                     if (result.time != "-") {
                         sum += Number(result.time);
                         num ++;
                     }
                 });
-                return sum / num;
+                let accuracy = num / results.length;
+                let average = sum / num;
+                return [average, accuracy];
             }
-            function getAccuracy(last) {
-                let num = 0;
-                results.slice(-last).forEach(result => {
-                    if (result.time != "-") {
-                        num ++;
+            function getBestAverage(bestOf, accuracyTreshold) {
+                let best = null;
+                for (i = 0; i <= results.length - bestOf; i++) {
+                    let [average, accuracy] = getAverage(results.slice(i, i + bestOf));
+                    if (accuracy >= accuracyTreshold && (best == null || average != null && average < best)) {
+                        best = average;
                     }
-                });
-                if (last > 0 && last < results.length) {
-                    return num / last
                 }
-                return num / results.length;
+                return best;
             }
             function createLanguageSetting() {
                 language = localStorage.getItem("language");
@@ -269,9 +282,10 @@
                 <table id="stats-table">
                     <thead>
                         <tr>
-                            <th></th>
+                            <th>Last</th>
                             <th>Avg</th>
                             <th>Acc</th>
+                            <th>Best</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
