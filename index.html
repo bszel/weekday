@@ -210,14 +210,23 @@
                     select.appendChild(option);
                 });
             }
+            function getNewSessionName(currentSession) {
+                const notUnique = sessionList.some(session => session.startsWith(currentSession));
+                if (notUnique) {
+                    let max = 0;
+                    sessionList.forEach(session => {
+                        if (session.startsWith(currentSession)) {
+                            lastPart = session.slice(currentSession.length + 1);
+                            max = Math.max(max, Number(lastPart));
+                        }
+                    });
+                    currentSession += "-" + (max + 1);
+                }
+                return currentSession;
+            }
             function addSession() {
                 let currentDate = new Date().toLocaleDateString(language);
-                currentSession = "session-" + currentDate;
-                let i = 1;
-                while (sessionList.includes(currentSession)) {
-                    i++;
-                    currentSession = "session-" + currentDate + "-" + i;
-                }
+                currentSession = getNewSessionName("session-" + currentDate);
                 sessionList.push(currentSession);
             }
             function deleteSession() {
@@ -225,7 +234,8 @@
                 let index = sessionList.indexOf(currentSession);
                 sessionList.splice(index, 1);
                 if (sessionList.length == 0) {
-                    currentSession = "session-" + new Date().toLocaleDateString(language);
+                    let currentDate = new Date().toLocaleDateString(language);
+                    currentSession = "session-" + currentDate;
                     sessionList.push(currentSession);
                 }
                 else {
