@@ -140,3 +140,10 @@ select {
     height: 4vh;
     margin: auto 0;
 }
+#plot {
+    flex-grow: 1;
+    margin: 0 auto;
+    width: 70%;
+    height: 20vh;
+    max-width: 100%;
+}

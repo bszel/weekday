@@ -3,6 +3,7 @@
     <head>
         <title>Weekday</title>
         <link rel="stylesheet" href="style.css">
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script>
             function init() {
                 language = localStorage.language ?? navigator.language;
@@ -13,6 +14,7 @@
                 saveSession();
                 status = "idle";
                 date = null;
+                createPlot();
                 createGuessButtons();
                 createStartButton();
                 createSettingsButton();
@@ -20,6 +22,39 @@
                 displayStats();
                 createLanguageSetting();
                 createResetStatButton();
+            }
+            function movingAverage(values, windowSize) {
+                let avg = new Array(values.length).fill(null);
+                for (let i = 0; i < values.length; i++) {
+                    let window = values.slice(Math.max(0, i - windowSize + 1), i + 1).filter(val => val !== null);
+                    avg[i] = window.length > 0 ? window.reduce((sum, val) => sum + val, 0) / window.length : null;
+                }
+                return avg;
+            }
+            function createPlot() {
+                xValues = session.results.map((result, index) => index);
+                yValues = session.results.map(result => (result.time === "-" ? null : result.time));
+                const data = [{
+                    x: xValues,
+                    y: movingAverage(yValues, 10),
+                    mode: 'lines',
+                    type: 'scatter'
+                }];
+                const layout = {
+                    dragmode: false,
+                    xaxis: {range: [xValues.length / 20, xValues.length - 1]},
+                    margin: {b: 30, l: 30, r: 30, t: 30},
+                    paper_bgcolor: "#222222",
+                    plot_bgcolor: "#222222",
+                    font: {color: "#e0e0e0"},
+                    autoresize: true
+                };
+                const config = {
+                    scrollZoom: false,
+                    displayModeBar: false,
+                    responsive: true
+                };
+                Plotly.react("plot", data, layout, config);
             }
             function randomInteger(min, max) {
                 return Math.floor(Math.random() * (max - min) ) + min;
@@ -164,6 +199,7 @@
                     statistics.push(new Statistic(session.results.length, average, accuracy));
                 }
                 document.querySelector("#stats-table tbody").innerHTML = statistics.map((statistic, index) => `<tr class="row-type-${index % 2}"><th>${statistic.name}</th><td>${statistic.average}</td><td>${statistic.accuracy}</td><td>${statistic.best}</td></tr>`).join('');
+                createPlot();
             }
             function getAverage(results) {
                 let sum = 0;
@@ -325,6 +361,7 @@
                 <div id="guess"></div>
                 <div id="result"></div>
                 <div id="start-button"></div>
+                <div id="plot"></div>
             </div>
         </div>
         <div id="statistics">
