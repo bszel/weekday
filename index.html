@@ -345,7 +345,7 @@
                 document.getElementById("date").innerHTML = date ? date.toLocaleDateString(language) : "";
             }
             function backwardsFix() {
-                if (!localStorage.getItem("current-session").startsWith("session-")) {
+                if (localStorage.getItem("current-session") && !localStorage.getItem("current-session").startsWith("session-")) {
                     currentSession = "session-" + new Date().toLocaleDateString(language);
                 }
                 localStorage.removeItem("session-count");
@@ -354,44 +354,46 @@
     </head>
     <body>
         <div id="settings-button"></div>
-        <div id="guess-area">
-            <div id="date"></div>
-            <div id="guess-buttons"></div>
-            <div id="result-section">
-                <div id="guess"></div>
-                <div id="result"></div>
-                <div id="start-button"></div>
-                <div id="plot"></div>
+        <div id="container">
+            <div id="statistics">
+                <div id="session">
+                    <div>Session:&nbsp</div>
+                    <select id="session-select"></select>
+                </div>
+                <div id="stats">
+                    <table id="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Last</th>
+                                <th>Avg</th>
+                                <th>Acc</th>
+                                <th>Best</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="results">
+                    <table id="results-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div id="statistics">
-            <div id="session">
-                <div>Session:&nbsp</div>
-                <select id="session-select"></select>
-            </div>
-            <div id="stats">
-                <table id="stats-table">
-                    <thead>
-                        <tr>
-                            <th>Last</th>
-                            <th>Avg</th>
-                            <th>Acc</th>
-                            <th>Best</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div id="results">
-                <table id="results-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div id="guess-area">
+                <div id="date"></div>
+                <div id="guess-buttons"></div>
+                <div id="result-section">
+                    <div id="guess"></div>
+                    <div id="result"></div>
+                    <div id="start-button"></div>
+                    <div id="plot"></div>
+                </div>
             </div>
         </div>
         <div id="settings-background"></div>

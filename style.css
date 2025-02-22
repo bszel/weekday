@@ -3,6 +3,9 @@ body {
     color: rgb(224, 224, 224);
     font-size: 2.2vh;
     font-family: 'Arial';
+    margin: 0;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 button {
     background-color: rgb(53, 53, 53);
@@ -34,6 +37,9 @@ button:hover {
 }
 #guess-area{
     text-align: center;
+    box-sizing: border-box;
+    flex-grow: 1000;
+    flex-basis: 500px;
 }
 #date {
     text-align: center;
@@ -42,19 +48,13 @@ button:hover {
 #statistics {
     display: flex;
     flex-direction: column;
-    position:absolute;
-    bottom: 0;
-    height: 80vh;
-    width: 30vh;
-    max-height: 80vw;
-    min-height: 40vh;
-    overflow: hidden;
+    flex-grow: 1;
+    flex-basis: 30vh;
     text-align: center;
-    box-sizing: content-box;
+    box-sizing: border-box;
     border: 1px solid rgb(83, 83, 83);
 }
 #stats {
-    top:0;
     width: 100%;
 }
 #stats-table {
@@ -62,8 +62,8 @@ button:hover {
     table-layout: fixed;
 }
 #results {
-    flex: 1;
-    width: 100%;
+    flex-grow: 1;
+    height: 30vh;
     overflow-y: auto;
 }
 #results::-webkit-scrollbar {
@@ -89,6 +89,8 @@ select {
     color: rgb(224, 224, 224);
 }
 thead {
+    position: sticky;
+    top: 0;
     background-color: rgb(29, 29, 29);
 }
 #settings {
@@ -113,7 +115,9 @@ thead {
     opacity: 0.3;
 }
 #settings-button {
+    box-sizing: border-box;
     font-size: 2.2vh;
+    height: 4vh;
 }
 select {
     font-size: 2.2vh;
@@ -128,7 +132,7 @@ select {
   }
 #session {
     margin: 0 auto;
-    display:flex;
+    display: flex;
     flex-direction: row;
 }
 #language-setting {
@@ -146,4 +150,11 @@ select {
     width: 70%;
     height: 20vh;
     max-width: 100%;
+}
+#container {
+    box-sizing: border-box;
+    width: 100vw;
+    height: calc(100vh - 4vh);
+    display: flex;
+    flex-wrap: wrap-reverse;
 }
