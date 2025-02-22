@@ -117,7 +117,7 @@ thead {
 #settings-button {
     box-sizing: border-box;
     font-size: 2.2vh;
-    height: 4vh;
+    height: 4dvh;
 }
 select {
     font-size: 2.2vh;
@@ -154,7 +154,7 @@ select {
 #container {
     box-sizing: border-box;
     width: 100vw;
-    height: calc(100vh - 4vh);
+    height: 96dvh;
     display: flex;
     flex-wrap: wrap-reverse;
 }
