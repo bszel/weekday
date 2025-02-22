@@ -8,6 +8,7 @@
             function init() {
                 language = localStorage.language ?? navigator.language;
                 currentSession = localStorage.getItem("current-session") ?? "session-" + new Date().toLocaleDateString(language);
+                setToggleSections();
                 backwardsFix();
                 session = retreiveSession(currentSession);
                 sessionList = JSON.parse(localStorage.getItem("list-of-sessions")) ?? [currentSession];
@@ -18,10 +19,22 @@
                 createGuessButtons();
                 createStartButton();
                 createSettingsButton();
+                createToggleStatsButton();
                 createSessionSelect();
                 displayStats();
                 createLanguageSetting();
                 createResetStatButton();
+            }
+            function setToggleSections() {
+                sections = JSON.parse(localStorage.getItem("section-toggles")) ?? {"statistics": true};
+                localStorage.setItem("section-toggles", JSON.stringify(sections));
+                document.getElementById("statistics").hidden = !sections.statistics;
+            }
+            function toggleStatisticsButton() {
+                sections.statistics = !sections.statistics;
+                localStorage.setItem("section-toggles", JSON.stringify(sections));
+                document.getElementById("statistics").hidden = !sections.statistics;
+                Plotly.Plots.resize("plot");
             }
             function movingAverage(values, windowSize) {
                 let avg = new Array(values.length).fill(null);
@@ -32,8 +45,8 @@
                 return avg;
             }
             function createPlot() {
-                xValues = session.results.map((result, index) => index);
-                yValues = session.results.map(result => (result.time === "-" ? null : result.time));
+                let xValues = session.results.map((result, index) => index);
+                let yValues = session.results.map(result => (result.time === "-" ? null : result.time));
                 const data = [{
                     x: xValues,
                     y: movingAverage(yValues, 10),
@@ -71,7 +84,6 @@
                 document.getElementById("date").innerHTML = date.toLocaleDateString(language);
                 document.getElementById("guess-buttons").hidden = false;
                 document.getElementById("result-section").hidden = true;
-                document.getElementById("statistics").hidden = true;
                 startTime = new Date();
                 status = "guess";
             }
@@ -91,7 +103,6 @@
                 displayStats();
                 document.getElementById("guess-buttons").hidden = true;
                 document.getElementById("result-section").hidden = false;
-                document.getElementById("statistics").hidden = false;
                 status = "idle";
             }
             function createGuessButtons() {
@@ -123,7 +134,7 @@
                 let container = document.getElementById("settings-button");
                 let button = document.createElement("button");
                 button.textContent = "Settings";
-                button.id = "settings-button";
+                button.className = "navbar-button";
                 button.onclick = function () {
                     document.getElementById("settings").hidden = false;
                     document.getElementById("settings-background").hidden = false;
@@ -135,6 +146,17 @@
                 };
                 document.getElementById("settings").hidden = true;
                 document.getElementById("settings-background").hidden = true;
+            }
+            function createToggleStatsButton() {
+                let container = document.getElementById("toggle-stats-button");
+                let button = document.createElement("button");
+                button.textContent = "Statistics";
+                button.className = "navbar-button";
+                button.onclick = function () {
+                    button.blur();
+                    toggleStatisticsButton();
+                };
+                container.appendChild(button);
             }
             document.addEventListener("keypress", onEvent); 
                 function onEvent(event){
@@ -353,7 +375,10 @@
         </script>
     </head>
     <body>
-        <div id="settings-button"></div>
+        <div id="navbar">
+            <div id="settings-button"></div>
+            <div id="toggle-stats-button"></div>
+        </div>
         <div id="container">
             <div id="statistics">
                 <div id="session">

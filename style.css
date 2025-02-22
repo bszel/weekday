@@ -113,10 +113,16 @@ thead {
     background-color: rgb(41, 41, 41);
     opacity: 0.3;
 }
-#settings-button {
+#navbar {
     box-sizing: border-box;
-    font-size: 2.2vh;
+    display: flex;
+    flex-direction: row;
     height: 4dvh;
+}
+.navbar-button {
+    box-sizing: border-box;
+    height: 100%;
+    font-size: 2.2vh;
 }
 select {
     font-size: 2.2vh;
@@ -144,7 +150,6 @@ select {
     margin: auto 0;
 }
 #plot {
-    flex-grow: 1;
     margin: 0 auto;
     width: 70%;
     height: 20vh;
