@@ -1,20 +1,27 @@
+:root {
+    --color-main: rgb(34, 34, 34);
+    --color-low-contrast: rgb(51, 51, 51);
+    --color-medium-contrast: rgb(66, 66, 66);
+    --color-medium-high-contrast: rgb(100, 100, 100);
+    --color-high-contrast: rgb(224, 224, 224);
+}
 body {
-    background-color: rgb(34, 34, 34);
-    color: rgb(224, 224, 224);
+    background-color: var(--color-main);
+    color: var(--color-high-contrast);
     font-size: 2.2vh;
     font-family: 'Arial';
     margin: 0;
     box-sizing: border-box;
 }
 button {
-    background-color: rgb(53, 53, 53);
-    color: rgb(224, 224, 224);
+    background-color: var(--color-low-contrast);
+    color: var(--color-high-contrast);
     border: none;
     font-size: 2.2vh;
     touch-action: manipulation;
 }
 button:hover {
-    background-color: rgb(70, 70, 70);
+    background-color: var(--color-medium-high-contrast);
 }
 #start-button {
     margin: 0 auto;
@@ -54,7 +61,7 @@ button:hover {
     flex-basis: 30vh;
     text-align: center;
     box-sizing: border-box;
-    border: 1px solid rgb(83, 83, 83);
+    border: 1px solid var(--color-medium-high-contrast);
 }
 #stats {
     width: 100%;
@@ -75,37 +82,37 @@ button:hover {
     width: 100%;
 }
 .row-type-0 {
-    background-color: rgb(51, 51, 51);
+    background-color: var(--color-low-contrast);
 }
 .row-type-1 {
-    background-color: rgb(66, 66, 66);
+    background-color: var(--color-medium-contrast);
 }
 .row-type-0:hover {
-    background-color: rgb(100, 100, 100);
+    background-color: var(--color-medium-high-contrast);
 }
 .row-type-1:hover {
-    background-color: rgb(100, 100, 100);
+    background-color: var(--color-medium-high-contrast);
 }
 select {
-    background-color: rgb(83, 83, 83);
-    color: rgb(224, 224, 224);
+    background-color: var(--color-low-contrast);
+    color: var(--color-high-contrast);
 }
 thead {
     position: sticky;
     top: 0;
-    background-color: rgb(29, 29, 29);
+    background-color: var(--color-main);
 }
 #settings {
     position: absolute;
     transform: translate(-50%, -50%);
     top: 50%;
     left: 50%;
-    background-color:rgb(41, 41, 41);
+    background-color: var(--color-main);
     opacity: 0.8;
     height: 70vh;
     width: 66vw;
     padding: 10px;
-    border: 1px solid rgb(83, 83, 83);
+    border: 1px solid var(--color-medium-high-contrast);
 }
 #settings-background {
     position: absolute;
@@ -113,7 +120,7 @@ thead {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgb(41, 41, 41);
+    background-color: var(--color-medium-contrast);
     opacity: 0.3;
 }
 #navbar {

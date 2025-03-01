@@ -6,6 +6,11 @@
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script>
             function init() {
+                let colorThemes = [
+                    new ColorTheme("Dark", "#222222", "#333333", "#424242", "#646464", "#e0e0e0"),
+                    new ColorTheme("Light", "#dddddd", "#cccccc", "#bdbdbd", "#9b9b9b", "#1f1f1f")
+                ];
+                colorTheme = colorThemes[localStorage.colorTheme ?? 0];
                 language = localStorage.language ?? navigator.language;
                 currentSession = localStorage.getItem("current-session") ?? "session-" + new Date().toLocaleDateString(language);
                 setToggleSections();
@@ -23,7 +28,9 @@
                 createSessionSelect();
                 displayStats();
                 createLanguageSetting();
+                createThemeSetting();
                 createResetStatButton();
+                changeColor(colorTheme);
             }
             function setToggleSections() {
                 sections = JSON.parse(localStorage.getItem("section-toggles")) ?? {"statistics": true};
@@ -57,9 +64,9 @@
                     dragmode: false,
                     xaxis: {range: [xValues.length / 20, xValues.length - 1]},
                     margin: {b: 30, l: 30, r: 30, t: 30},
-                    paper_bgcolor: "#222222",
-                    plot_bgcolor: "#222222",
-                    font: {color: "#e0e0e0"},
+                    paper_bgcolor: colorTheme.main,
+                    plot_bgcolor: colorTheme.main,
+                    font: {color: colorTheme.highContrast},
                     autoresize: true
                 };
                 const config = {
@@ -372,6 +379,40 @@
                 }
                 localStorage.removeItem("session-count");
             }
+            function ColorTheme(name, main, lowContrast, mediumContrast, mediumHighContrast, highContrast) {
+                this.name = name;
+                this.main = main;
+                this.lowContrast = lowContrast;
+                this.mediumContrast = mediumContrast;
+                this.mediumHighContrast = mediumHighContrast;
+                this.highContrast = highContrast;
+            }
+            function changeColor(colorTheme) {
+                let variables = document.querySelector(':root');
+                variables.style.setProperty('--color-main', colorTheme.main);
+                variables.style.setProperty('--color-low-contrast', colorTheme.lowContrast);
+                variables.style.setProperty('--color-medium-contrast', colorTheme.mediumContrast);
+                variables.style.setProperty('--color-medium-high-contrast', colorTheme.mediumHighContrast);
+                variables.style.setProperty('--color-high-contrast', colorTheme.highContrast);
+            }
+            function createThemeSetting() {
+                let colorThemes = [new ColorTheme("Dark", "#222222", "#333333", "#424242", "#646464", "#e0e0e0"), new ColorTheme("Light", "#dddddd", "#cccccc", "#bdbdbd", "#9b9b9b", "#1f1f1f")];
+                let select = document.getElementById("color-theme-setting");
+                select.addEventListener("change", function () {
+                    index = this.value;
+                    colorTheme = colorThemes[index];
+                    localStorage.colorTheme = index;
+                    changeColor(colorTheme);
+                    createPlot();
+                });
+                colorThemes.forEach((colorTheme, index) => {
+                    let option = document.createElement("option");
+                    option.value = index;
+                    option.text = colorTheme.name;
+                    select.appendChild(option);
+                });
+                select.value = localStorage.colorTheme ?? 0;
+            }
         </script>
     </head>
     <body>
@@ -426,6 +467,10 @@
             <div class="setting">
                 <div>Date format:&nbsp</div>
                 <select id="language-setting"></select>
+            </div>
+            <div class="setting">
+                <div>Color theme:&nbsp</div>
+                <select id="color-theme-setting"></select>
             </div>
             <div class="setting">
                 <div>Reset all statistics&nbsp</div>
