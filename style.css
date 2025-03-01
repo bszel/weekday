@@ -19,6 +19,7 @@ button {
     border: none;
     font-size: 2.2vh;
     touch-action: manipulation;
+    cursor: pointer;
 }
 button:hover {
     background-color: var(--color-medium-high-contrast);
@@ -96,6 +97,7 @@ button:hover {
 select {
     background-color: var(--color-low-contrast);
     color: var(--color-high-contrast);
+    cursor: pointer;
 }
 thead {
     position: sticky;
@@ -114,14 +116,14 @@ thead {
     padding: 10px;
     border: 1px solid var(--color-medium-high-contrast);
 }
-#settings-background {
+#background-blur {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background-color: var(--color-medium-contrast);
-    opacity: 0.3;
+    opacity: 0.5;
 }
 #navbar {
     box-sizing: border-box;
@@ -172,4 +174,41 @@ select {
     height: 96dvh;
     display: flex;
     flex-wrap: wrap-reverse;
+}
+#session-overview-button {
+    cursor: pointer;
+}
+#session-overview-button:hover {
+    background-color: var(--color-medium-high-contrast);
+}
+#session-overview {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    background-color: var(--color-main);
+    opacity: 0.8;
+    height: 70vh;
+    width: 80vw;
+    padding: 10px;
+    border: 1px solid var(--color-medium-high-contrast);
+    text-align: center;
+}
+#session-overview-title {
+    font-size: 2.5vh;
+    height: 4vh;
+}
+#session-overview-table-container {
+    box-sizing: border-box;
+    border: 1px solid var(--color-medium-high-contrast);
+    width: 100%;
+    height: 92%;
+    overflow-y: auto;
+}
+#session-overview-table-container::-webkit-scrollbar {
+    display: none;
+}
+#session-overview-table {
+    width: 100%;
+    font-size: min(3.5vw, 2.2vh);
 }

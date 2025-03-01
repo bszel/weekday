@@ -6,7 +6,7 @@
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script>
             function init() {
-                let colorThemes = [
+                colorThemes = [
                     new ColorTheme("Dark", "#222222", "#333333", "#424242", "#646464", "#e0e0e0"),
                     new ColorTheme("Light", "#dddddd", "#cccccc", "#bdbdbd", "#9b9b9b", "#1f1f1f")
                 ];
@@ -31,6 +31,8 @@
                 createThemeSetting();
                 createResetStatButton();
                 changeColor(colorTheme);
+                createSessionButton();
+                createBackgroundBlur();
             }
             function setToggleSections() {
                 sections = JSON.parse(localStorage.getItem("section-toggles")) ?? {"statistics": true};
@@ -144,15 +146,10 @@
                 button.className = "navbar-button";
                 button.onclick = function () {
                     document.getElementById("settings").hidden = false;
-                    document.getElementById("settings-background").hidden = false;
+                    document.getElementById("background-blur").hidden = false;
                 };
                 container.appendChild(button);
-                document.getElementById("settings-background").onclick = function () {
-                    document.getElementById("settings").hidden = true;
-                    document.getElementById("settings-background").hidden = true;
-                };
                 document.getElementById("settings").hidden = true;
-                document.getElementById("settings-background").hidden = true;
             }
             function createToggleStatsButton() {
                 let container = document.getElementById("toggle-stats-button");
@@ -396,10 +393,9 @@
                 variables.style.setProperty('--color-high-contrast', colorTheme.highContrast);
             }
             function createThemeSetting() {
-                let colorThemes = [new ColorTheme("Dark", "#222222", "#333333", "#424242", "#646464", "#e0e0e0"), new ColorTheme("Light", "#dddddd", "#cccccc", "#bdbdbd", "#9b9b9b", "#1f1f1f")];
                 let select = document.getElementById("color-theme-setting");
                 select.addEventListener("change", function () {
-                    index = this.value;
+                    let index = this.value;
                     colorTheme = colorThemes[index];
                     localStorage.colorTheme = index;
                     changeColor(colorTheme);
@@ -413,6 +409,49 @@
                 });
                 select.value = localStorage.colorTheme ?? 0;
             }
+            function createSessionButton() {
+                let button = document.getElementById("session-overview-button");
+                button.onclick = function() {
+                    document.getElementById("session-overview").hidden = false;
+                    document.getElementById("background-blur").hidden = false;
+                    displaySessionOverviewStats();
+                }
+                document.getElementById("session-overview").hidden = true;
+            }
+            function createBackgroundBlur() {
+                document.getElementById("background-blur").onclick = function () {
+                    document.getElementById("settings").hidden = true;
+                    document.getElementById("session-overview").hidden = true;
+                    document.getElementById("background-blur").hidden = true;
+                };
+                document.getElementById("background-blur").hidden = true;
+            }
+            function SessionStatistic(name, average, accuracy, best, best5, best10, best100) {
+                this.name = name.slice(8);
+                if (average != null) {this.average = average.toFixed(2)} else {this.average = ""}
+                this.accuracy = (accuracy * 100).toFixed(0) + "%";
+                if (best != null) {this.best = best.toFixed(2)} else {this.best = ""}
+                if (best5 != null) {this.best5 = best5.toFixed(2)} else {this.best5 = ""}
+                if (best10 != null) {this.best10 = best10.toFixed(2)} else {this.best10 = ""}
+                if (best100 != null) {this.best100 = best100.toFixed(2)} else {this.best100 = ""}
+            }
+            function displaySessionOverviewStats() {
+                let sessionStatistics = []
+                let milestones = [1, 5, 10, 100]
+                sessionList.forEach((key, index) => {
+                    let session = retreiveSession(key);
+                    let best = [null, null, null, null];
+                    milestones.forEach((milestone, index) => {
+                        if (session.results.length >= milestone) {
+                            best[index] = getBestAverage(session.results, milestone, 0.9);
+                        }
+                    });
+                    let [average, accuracy] = getAverage(session.results);
+                    let sessionStatistic = new SessionStatistic(key, average, accuracy, best[0], best[1], best[2], best[3]);
+                    sessionStatistics.push(sessionStatistic);
+                });
+                document.querySelector("#session-overview-table tbody").innerHTML = sessionStatistics.map((statistic, index) => `<tr class="row-type-${index % 2}"><td>${statistic.name}</td><td>${statistic.average}</td><td>${statistic.accuracy}</td><td>${statistic.best}</td><td>${statistic.best5}</td><td>${statistic.best10}</td><td>${statistic.best100}</td></tr>`).join('');
+            }
         </script>
     </head>
     <body>
@@ -423,7 +462,7 @@
         <div id="container">
             <div id="statistics">
                 <div id="session">
-                    <div>Session:&nbsp</div>
+                    <span id="session-overview-button">Session</span>&nbsp
                     <select id="session-select"></select>
                 </div>
                 <div id="stats">
@@ -462,7 +501,7 @@
                 </div>
             </div>
         </div>
-        <div id="settings-background"></div>
+        <div id="background-blur"></div>
         <div id="settings">
             <div class="setting">
                 <div>Date format:&nbsp</div>
@@ -475,6 +514,27 @@
             <div class="setting">
                 <div>Reset all statistics&nbsp</div>
                 <button id="reset-stats-button">Reset</button>
+            </div>
+        </div>
+        <div id="session-overview-container">
+            <div id="session-overview">
+                <div id="session-overview-title">Session overview</div>
+                <div id="session-overview-table-container">
+                    <table id="session-overview-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Avg</th>
+                                <th>Acc</th>
+                                <th>Best</th>
+                                <th>Best 5</th>
+                                <th>Best 10</th>
+                                <th>Best 100</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <script>
