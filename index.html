@@ -426,8 +426,9 @@
                 };
                 document.getElementById("background-blur").hidden = true;
             }
-            function SessionStatistic(name, average, accuracy, best, best5, best10, best100) {
+            function SessionStatistic(name, attempts, average, accuracy, best, best5, best10, best100) {
                 this.name = name.slice(8);
+                this.attempts = attempts;
                 if (average != null) {this.average = average.toFixed(2)} else {this.average = ""}
                 this.accuracy = (accuracy * 100).toFixed(0) + "%";
                 if (best != null) {this.best = best.toFixed(2)} else {this.best = ""}
@@ -447,10 +448,10 @@
                         }
                     });
                     let [average, accuracy] = getAverage(session.results);
-                    let sessionStatistic = new SessionStatistic(key, average, accuracy, best[0], best[1], best[2], best[3]);
+                    let sessionStatistic = new SessionStatistic(key, session.results.length, average, accuracy, best[0], best[1], best[2], best[3]);
                     sessionStatistics.push(sessionStatistic);
                 });
-                document.querySelector("#session-overview-table tbody").innerHTML = sessionStatistics.map((statistic, index) => `<tr class="row-type-${index % 2}"><td>${statistic.name}</td><td>${statistic.average}</td><td>${statistic.accuracy}</td><td>${statistic.best}</td><td>${statistic.best5}</td><td>${statistic.best10}</td><td>${statistic.best100}</td></tr>`).join('');
+                document.querySelector("#session-overview-table tbody").innerHTML = sessionStatistics.map((statistic, index) => `<tr class="row-type-${index % 2}"><td>${statistic.name}</td><td>${statistic.attempts}</td><td>${statistic.average}</td><td>${statistic.accuracy}</td><td>${statistic.best}</td><td>${statistic.best5}</td><td>${statistic.best10}</td><td>${statistic.best100}</td></tr>`).join('');
             }
         </script>
     </head>
@@ -524,12 +525,13 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>n</th>
                                 <th>Avg</th>
                                 <th>Acc</th>
                                 <th>Best</th>
-                                <th>Best 5</th>
-                                <th>Best 10</th>
-                                <th>Best 100</th>
+                                <th>B5</th>
+                                <th>B10</th>
+                                <th>B100</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
