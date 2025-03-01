@@ -182,6 +182,8 @@ select {
     background-color: var(--color-medium-high-contrast);
 }
 #session-overview {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     transform: translate(-50%, -50%);
     top: 50%;
@@ -195,14 +197,15 @@ select {
     text-align: center;
 }
 #session-overview-title {
+    flex: 1;
     font-size: 2.5vh;
     height: 4vh;
 }
 #session-overview-table-container {
+    flex-grow: 1;
     box-sizing: border-box;
     border: 1px solid var(--color-medium-high-contrast);
     width: 100%;
-    height: 92%;
     overflow-y: auto;
 }
 #session-overview-table-container::-webkit-scrollbar {
