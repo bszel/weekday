@@ -3,7 +3,7 @@
     <head>
         <title>Weekday</title>
         <link rel="stylesheet" href="style.css">
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
         <script>
             function init() {
                 colorThemes = [
@@ -29,6 +29,8 @@
                 displayStats();
                 createLanguageSetting();
                 createThemeSetting();
+                createExportButton();
+                createImportButton();
                 createResetStatButton();
                 changeColor(colorTheme);
                 createSessionButton();
@@ -344,19 +346,20 @@
                 select.appendChild(option);
                 select.value = localStorage.getItem("current-session") ?? "session-" + new Date().toLocaleDateString(language);
             }
+            function resetStats() {
+                sessionList.forEach(key => {
+                    localStorage.removeItem(key);
+                });
+                localStorage.removeItem("current-session");
+                localStorage.removeItem("list-of-sessions");
+            }
             function createResetStatButton() {
                 let button = document.getElementById("reset-stats-button");
                 button.onclick = function () {
                     if (confirm("This will delete all of your saved times, are you sure?")) {
-                        sessionList.forEach(key => {
-                            localStorage.removeItem(key);
-                        });
-                        localStorage.removeItem("session-count");
-                        localStorage.removeItem("current-session");
-                        localStorage.removeItem("list-of-sessions")
+                        resetStats();
                         currentSession = "session-" + new Date().toLocaleDateString(language);
                         session = retreiveSession(currentSession);
-                        sessionList = []
                         sessionList.push(currentSession);
                         saveSession();
                         displayStats();
@@ -453,6 +456,66 @@
                 });
                 document.querySelector("#session-overview-table tbody").innerHTML = sessionStatistics.map((statistic, index) => `<tr class="row-type-${index % 2}"><td>${statistic.name}</td><td>${statistic.attempts}</td><td>${statistic.average}</td><td>${statistic.accuracy}</td><td>${statistic.best}</td><td>${statistic.best5}</td><td>${statistic.best10}</td><td>${statistic.best100}</td></tr>`).join('');
             }
+            function StatisticsData(sessionList, sessions) {
+                this.sessionList = sessionList;
+                this.sessions = sessions;
+            }
+            function exportData() {
+                let sessions = [];
+                sessionList.forEach(key => {
+                    let session = retreiveSession(key);
+                    sessions.push(session);
+                });
+                let statisticsData = new StatisticsData(sessionList, sessions);
+                let jsonData = JSON.stringify(statisticsData);
+                let blob = new Blob([jsonData], {type: "application/json"});
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = new Date().toLocaleString("sv-SE").replace(/[:]/g, '-').replace(/[ ]/g, '_');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            function createExportButton() {
+                let button = document.getElementById("export-stats-button");
+                button.onclick = function () {
+                    exportData();
+                }
+            }
+            async function importData() {
+                try {
+                    const [fileHandle] = await window.showOpenFilePicker();
+                    const file = await fileHandle.getFile();
+                    if (confirm("This will overwrite your existing times. Make sure your data is backed up beforehand.")) {
+                        const text = await file.text();
+                        const statisticsData = JSON.parse(text);
+                        resetStats();
+                        sessionList = statisticsData.sessionList;
+                        currentSession = sessionList.slice(-1)[0];
+                        statisticsData.sessions.forEach((session, index) => {
+                            localStorage.setItem(sessionList[index], JSON.stringify(session));
+                        });
+                        session = retreiveSession(currentSession);
+                        saveSession();
+                        displayStats();
+                        createSessionSelect();
+                    }
+                } catch (error) {
+                    if (error.name != "AbortError") {
+                        console.error("Import failed:", error);
+                        alert("Import failed.");
+                        sessionList = []
+                    }
+                }
+            }
+            function createImportButton() {
+                let button = document.getElementById("import-stats-button");
+                button.onclick = function () {
+                    importData();
+                }
+            }
         </script>
     </head>
     <body>
@@ -513,7 +576,15 @@
                 <select id="color-theme-setting"></select>
             </div>
             <div class="setting">
-                <div>Reset all statistics&nbsp</div>
+                <div>Export statistics:&nbsp</div>
+                <button id="export-stats-button">Export</button>
+            </div>
+            <div class="setting">
+                <div>Import statistics:&nbsp</div>
+                <button id="import-stats-button">Import</button>
+            </div>
+            <div class="setting">
+                <div>Reset all statistics:&nbsp</div>
                 <button id="reset-stats-button">Reset</button>
             </div>
         </div>
