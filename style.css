@@ -12,6 +12,7 @@ body {
     font-family: 'Arial';
     margin: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 button {
     background-color: var(--color-low-contrast);
@@ -21,8 +22,13 @@ button {
     touch-action: manipulation;
     cursor: pointer;
 }
-button:hover {
+button:active {
     background-color: var(--color-medium-high-contrast);
+}
+@media (hover: hover) {
+    button:hover {
+        background-color: var(--color-medium-high-contrast);
+    }
 }
 #start-button {
     margin: 0 auto;
